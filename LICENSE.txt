@@ -1,0 +1,11 @@
+PyMinecraft license
+===================
+
+This library is licensed under GPLv3, but you may also not use the software for
+evil purposes (see original mcpi license below).
+
+Original mcpi license
+=====================
+
+You may use any of the source code included in the distribution for any purpose
+(except evil).
