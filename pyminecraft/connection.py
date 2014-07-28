@@ -9,7 +9,7 @@ class RequestError(RuntimeError):
 
 class Connection:
     """
-    TCP socket connection to a Minecraft Pi game.
+    TCP socket connection to a Minecraft Pi game. Default port is 4711.
     """
     def __init__(self, address, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -33,10 +33,10 @@ class Connection:
         """
         Send data. Note that a trailing newline '\n' is added here.
         """
-        s = '%s(%s)\n' % (func, ','.join(args))
+        s = '%s(%s)\n' % (func, ','.join(map(str, args)))
         self.drain()
         self.last_sent = s
-        self.socket.sendall(s)
+        self.socket.sendall(s.encode('ascii'))
 
     def receive(self):
         """
