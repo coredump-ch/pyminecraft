@@ -9,52 +9,88 @@ class Command:
     """
     The command base class.
     """
-    func_prefix = ''
+    _func_prefix = ''
 
     def __init__(self, connection):
-        self.conn = connection
+        self._conn = connection
 
     def _send(self, func, *args):
-        full_func = '%s.%s' % (self.func_prefix, func)
-        self.conn.send(full_func, *args)
+        full_func = '%s.%s' % (self._func_prefix, func)
+        self._conn.send(full_func, *args)
 
     def _send_receive(self, func, *args):
-        full_func = '%s.%s' % (self.func_prefix, func)
-        return self.conn.send_receive(full_func, *args)
+        full_func = '%s.%s' % (self._func_prefix, func)
+        return self._conn.send_receive(full_func, *args)
 
 
 class WorldCommand(Command):
-    func_prefix = 'world'
+    _func_prefix = 'world'
 
-    def get_block(self, x, y, z) -> int:
-        return int(self._send_receive('getBlock', x, y, z))
+    def get_block(self, x, y, z):
+        value = self._send_receive('getBlock', x, y, z)
+        return int(value)
 
-    def set_block(self, x, y, z, block_type) -> None:
+    def set_block(self, x, y, z, block_type):
         self._send('setBlock', x, y, z, block_type)
 
-    def set_blocks(self, x1, y1, z1, x2, y2, z2, block_type) -> None:
+    def set_blocks(self, x1, y1, z1, x2, y2, z2, block_type):
         self._send('setBlocks', x1, y1, z1, x2, y2, z2, block_type)
 
-    def get_height(self, x, z) -> int:
-        return int(self._send_receive('getHeight', x, z))
+    def get_height(self, x, z):
+        value = self._send_receive('getHeight', x, z)
+        return int(value)
 
-    def save_checkpoint(self) -> None:
-        self._send('saveCheckpoint')
+    def save_checkpoint(self):
+        self._send('checkpoint.save')
 
-    def restore_checkpoint(self) -> None:
-        self._send('restoreCheckpoint')
+    def restore_checkpoint(self):
+        self._send('checkpoint.restore')
 
-    def setting(self) -> None:
+    def setting(self):
         # TODO what does this do?
         pass
 
 
 class ChatCommand(Command):
-    func_prefix = 'chat'
+    _func_prefix = 'chat'
 
-    def post(self, message) -> None:
+    def post(self, message):
         self._send('post', message)
         pass
+
+
+class PlayerCommand(Command):
+    _func_prefix = 'player'
+
+    def get_tile(self):
+        value = self._send_receive('getTile')
+        return [int(x) for x in value.split(',')]
+
+    def set_tile(self, x, y, z):
+        self._send('setTile', x, y, z)
+
+    def get_pos(self):
+        value = self._send_receive('getPos')
+        return [float(x) for x in value.split(',')]
+
+    def set_pos(self, x, y, z):
+        self._send('setPos', x, y, z)
+
+
+class CameraCommand(Command):
+    _func_prefix = 'camera.mode'
+
+    def set_normal(self):
+        self._send('setNormal')
+
+    def set_third_person(self):
+        self._send('setThirdPerson')
+
+    def set_fixed(self):
+        self._send('setFixed')
+
+    def set_pos(self, x, y, z):
+        self._send('setPos', x, y, z)
 
 
 class Minecraft:
@@ -63,3 +99,5 @@ class Minecraft:
         conn = Connection(ip, port)
         self.world = WorldCommand(conn)
         self.chat = ChatCommand(conn)
+        self.player = PlayerCommand(conn)
+        self.camera = CameraCommand(conn)
