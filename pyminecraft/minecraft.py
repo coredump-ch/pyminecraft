@@ -1,10 +1,6 @@
 from .connection import Connection
 
 
-class CommandError(RuntimeError):
-    pass
-
-
 class Command:
     """
     The command base class.
