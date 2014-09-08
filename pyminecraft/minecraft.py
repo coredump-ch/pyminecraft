@@ -98,12 +98,12 @@ class Minecraft:
 
     def __init__(self, ip='127.0.0.1', port=4711):
         logger.info('Initializing connection to %s:%d...', ip, port)
-        conn = Connection(ip, port)
+        self.conn = Connection(ip, port)
         logger.info('Loading world commands...')
-        self.world = WorldCommand(conn)
+        self.world = WorldCommand(self.conn)
         logger.info('Loading chat commands...')
-        self.chat = ChatCommand(conn)
+        self.chat = ChatCommand(self.conn)
         logger.info('Loading player commands...')
-        self.player = PlayerCommand(conn)
+        self.player = PlayerCommand(self.conn)
         logger.info('Loading camera commands...')
-        self.camera = CameraCommand(conn)
+        self.camera = CameraCommand(self.conn)
