@@ -1,4 +1,9 @@
+import logging
+
 from .connection import Connection
+
+
+logger = logging.getLogger(__name__)
 
 
 class Command:
@@ -92,8 +97,13 @@ class CameraCommand(Command):
 class Minecraft:
 
     def __init__(self, ip='127.0.0.1', port=4711):
+        logger.info('Initializing connection to %s:%d...', ip, port)
         conn = Connection(ip, port)
+        logger.info('Loading world commands...')
         self.world = WorldCommand(conn)
+        logger.info('Loading chat commands...')
         self.chat = ChatCommand(conn)
+        logger.info('Loading player commands...')
         self.player = PlayerCommand(conn)
+        logger.info('Loading camera commands...')
         self.camera = CameraCommand(conn)

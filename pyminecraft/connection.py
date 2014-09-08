@@ -1,6 +1,9 @@
 import socket
 import select
-import sys
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class RequestError(RuntimeError):
@@ -25,9 +28,8 @@ class Connection:
             if not readable:
                 break
             data = self.socket.recv(1500)
-            e = 'Drained Data: <%s>\nLast Message: <%s>\n' % (
-                    data.strip(), self.last_sent.strip())
-            sys.stderr.write(e)
+            logger.debug('Drained data: <%s>', data.strip())
+            logger.debug('Last message: <%s>', self.last_sent.strip())
 
     def send(self, func, *args):
         """
@@ -37,12 +39,14 @@ class Connection:
         self.drain()
         self.last_sent = s
         self.socket.sendall(s.encode('ascii'))
+        logger.info('Sent: %s', s)
 
     def receive(self):
         """
         Receive data. Note that the trailing newline '\n' is trimmed.
         """
         s = self.socket.makefile('r').readline().rstrip('\n')
+        logger.info('Read: %s', s)
         if s == 'Fail':
             raise RequestError('%s failed' % self.last_sent.strip())
         return s
